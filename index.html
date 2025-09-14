@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Vote Bookmarklet</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        .bookmarklet-box {
+            background: #f7fafc;
+            border: 2px dashed #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .bookmarklet-link {
+            display: block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+        .bookmarklet-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .instructions {
+            background: #e6fffa;
+            border-left: 4px solid #38b2ac;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .warning {
+            background: #fed7d7;
+            border-left: 4px solid #e53e3e;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+        .copy-button {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        .copy-button:hover {
+            background: #38a169;
+        }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Auto Vote Bookmarklet</h1>
+        
+        <div class="instructions">
+            <h3>📋 Hướng dẫn sử dụng:</h3>
+            <ol>
+                <li>Kéo thả nút bookmarklet bên dưới vào thanh bookmark của trình duyệt</li>
+                <li>Hoặc click chuột phải vào nút và chọn "Add to bookmarks"</li>
+                <li>Truy cập trang web cần auto vote</li>
+                <li>Click vào bookmark đã lưu để chạy script</li>
+            </ol>
+        </div>
+
+        <div class="bookmarklet-box">
+            <h3>🔖 Bookmarklet (kéo thả vào thanh bookmark):</h3>
+            <a href="javascript:(function(){const BUTTON_XPATH='//*[@id=%22app%22]/div/div/main/div/div/div/div/div[4]/div[1]/button[1]';function delay(ms){return new Promise(res=>setTimeout(res,ms))}function waitForWindowReady(w,timeoutMs=20000){const start=Date.now();return new Promise((resolve,reject)=>{const iv=setInterval(()=>{try{if(w.closed){clearInterval(iv);reject(new Error('Tab đã đóng.'));return}const rs=w.document?.readyState;if(rs==='interactive'||rs==='complete'){clearInterval(iv);resolve()}else if(Date.now()-start>timeoutMs){clearInterval(iv);reject(new Error('Timeout đợi trang load'))}}catch{}},200)})}function getAllByXPathInWindow(w,xpath){try{const nodes=w.document.evaluate(xpath,w.document,null,w.XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,null);const results=[];for(let i=0;i<nodes.snapshotLength;i++){results.push(nodes.snapshotItem(i))}return results}catch{return[]}}async function clickIfNeededInWindow(w,btn){if(!btn){console.log('❌ Không tìm thấy button');return}const cls=btn.className||'';if(cls.includes('text-gray-500')){btn.click();console.log('👉 Chưa vote → ĐÃ Vote')}else{console.log('✅ Đã vote → BỎ QUA')}}async function scrollToBottomSmooth(w,maxScrolls=20,scrollDelay=500){let lastHeight=w.document.body.scrollHeight;let scrollCount=0;while(scrollCount<maxScrolls){try{w.scrollTo(0,w.document.body.scrollHeight);await delay(scrollDelay);const newHeight=w.document.body.scrollHeight;if(newHeight===lastHeight){break}lastHeight=newHeight;scrollCount++}catch(e){console.warn('❌ Scroll error:',e);break}}}(async()=>{console.log('⏳ Bắt đầu xử lý các bài viết trên trang hiện tại…');try{const worker=window;await waitForWindowReady(worker,30000);await scrollToBottomSmooth(worker,20,800);await delay(1500);const buttons=getAllByXPathInWindow(worker,BUTTON_XPATH);console.log(`🔍 Tìm thấy ${buttons.length} nút vote.`);for(let btn of buttons){try{await clickIfNeededInWindow(worker,btn);await delay(1200)}catch(e){console.warn('⚠️ Lỗi khi xử lý nút:',e)}}console.log('🎉 Hoàn tất xử lý tất cả nút trên trang!')}catch(e){console.error('⚠️ Lỗi tổng thể:',e)}})()})();" class="bookmarklet-link">
+                🎯 Auto Vote Bookmarklet
+            </a>
+        </div>
+
+        <div class="warning">
+            <h3>⚠️ Lưu ý quan trọng:</h3>
+            <ul>
+                <li>Script này sẽ tự động tìm và click các nút vote trên trang</li>
+                <li>Chỉ vote những nút chưa được vote (có class "text-gray-500")</li>
+                <li>Sẽ scroll tự động để load thêm nội dung</li>
+                <li>Mở Console (F12) để xem log chi tiết</li>
+                <li>Sử dụng có trách nhiệm và tuân thủ quy định của trang web</li>
+            </ul>
+        </div>
+
+        <details style="margin-top: 30px;">
+            <summary style="cursor: pointer; font-weight: bold; padding: 10px; background: #edf2f7; border-radius: 5px;">
+                📝 Xem mã nguồn bookmarklet
+            </summary>
+            <div class="code-block" id="sourceCode">
+javascript:(function(){const BUTTON_XPATH='//*[@id=%22app%22]/div/div/main/div/div/div/div/div[4]/div[1]/button[1]';function delay(ms){return new Promise(res=>setTimeout(res,ms))}function waitForWindowReady(w,timeoutMs=20000){const start=Date.now();return new Promise((resolve,reject)=>{const iv=setInterval(()=>{try{if(w.closed){clearInterval(iv);reject(new Error('Tab đã đóng.'));return}const rs=w.document?.readyState;if(rs==='interactive'||rs==='complete'){clearInterval(iv);resolve()}else if(Date.now()-start>timeoutMs){clearInterval(iv);reject(new Error('Timeout đợi trang load'))}}catch{}},200)})}function getAllByXPathInWindow(w,xpath){try{const nodes=w.document.evaluate(xpath,w.document,null,w.XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,null);const results=[];for(let i=0;i<nodes.snapshotLength;i++){results.push(nodes.snapshotItem(i))}return results}catch{return[]}}async function clickIfNeededInWindow(w,btn){if(!btn){console.log('❌ Không tìm thấy button');return}const cls=btn.className||'';if(cls.includes('text-gray-500')){btn.click();console.log('👉 Chưa vote → ĐÃ Vote')}else{console.log('✅ Đã vote → BỎ QUA')}}async function scrollToBottomSmooth(w,maxScrolls=20,scrollDelay=500){let lastHeight=w.document.body.scrollHeight;let scrollCount=0;while(scrollCount<maxScrolls){try{w.scrollTo(0,w.document.body.scrollHeight);await delay(scrollDelay);const newHeight=w.document.body.scrollHeight;if(newHeight===lastHeight){break}lastHeight=newHeight;scrollCount++}catch(e){console.warn('❌ Scroll error:',e);break}}}(async()=>{console.log('⏳ Bắt đầu xử lý các bài viết trên trang hiện tại…');try{const worker=window;await waitForWindowReady(worker,30000);await scrollToBottomSmooth(worker,20,800);await delay(1500);const buttons=getAllByXPathInWindow(worker,BUTTON_XPATH);console.log(`🔍 Tìm thấy ${buttons.length} nút vote.`);for(let btn of buttons){try{await clickIfNeededInWindow(worker,btn);await delay(1200)}catch(e){console.warn('⚠️ Lỗi khi xử lý nút:',e)}}console.log('🎉 Hoàn tất xử lý tất cả nút trên trang!')}catch(e){console.error('⚠️ Lỗi tổng thể:',e)}})()})();
+            </div>
+            <button class="copy-button" onclick="copyToClipboard()">📋 Copy mã nguồn</button>
+        </details>
+
+        <div style="text-align: center; margin-top: 30px; color: #718096;">
+            <p>💡 Script được tối ưu hóa để hoạt động ổn định và an toàn</p>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard() {
+            const code = document.getElementById('sourceCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Đã copy!';
+                btn.style.background = '#48bb78';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#48bb78';
+                }, 2000);
+            }).catch(err => {
+                console.error('Lỗi copy:', err);
+                alert('Không thể copy tự động. Vui lòng copy thủ công.');
+            });
+        }
+    </script>
+</body>
+</html>
