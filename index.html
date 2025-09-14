@@ -105,7 +105,12 @@
             <ol>
                 <li>Kéo thả nút bookmarklet bên dưới vào thanh bookmark của trình duyệt</li>
                 <li>Hoặc click chuột phải vào nút và chọn "Add to bookmarks"</li>
-                <li>Truy cập trang web cần auto vote</li>
+                <li>
+                    Truy cập trang web cần auto vote :
+                    <a href="https://techhub.fpt.net/search?query=infmn&sort=new" target="_blank">
+                        https://techhub.fpt.net/search?query=infmn&sort=new
+                    </a>
+                </li>
                 <li>Click vào bookmark đã lưu để chạy script</li>
             </ol>
         </div>
@@ -135,7 +140,8 @@
             <div class="code-block" id="sourceCode">
 javascript:(function(){const BUTTON_XPATH='//*[@id=%22app%22]/div/div/main/div/div/div/div/div[4]/div[1]/button[1]';function delay(ms){return new Promise(res=>setTimeout(res,ms))}function waitForWindowReady(w,timeoutMs=20000){const start=Date.now();return new Promise((resolve,reject)=>{const iv=setInterval(()=>{try{if(w.closed){clearInterval(iv);reject(new Error('Tab đã đóng.'));return}const rs=w.document?.readyState;if(rs==='interactive'||rs==='complete'){clearInterval(iv);resolve()}else if(Date.now()-start>timeoutMs){clearInterval(iv);reject(new Error('Timeout đợi trang load'))}}catch{}},200)})}function getAllByXPathInWindow(w,xpath){try{const nodes=w.document.evaluate(xpath,w.document,null,w.XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,null);const results=[];for(let i=0;i<nodes.snapshotLength;i++){results.push(nodes.snapshotItem(i))}return results}catch{return[]}}async function clickIfNeededInWindow(w,btn){if(!btn){console.log('❌ Không tìm thấy button');return}const cls=btn.className||'';if(cls.includes('text-gray-500')){btn.click();console.log('👉 Chưa vote → ĐÃ Vote')}else{console.log('✅ Đã vote → BỎ QUA')}}async function scrollToBottomSmooth(w,maxScrolls=20,scrollDelay=500){let lastHeight=w.document.body.scrollHeight;let scrollCount=0;while(scrollCount<maxScrolls){try{w.scrollTo(0,w.document.body.scrollHeight);await delay(scrollDelay);const newHeight=w.document.body.scrollHeight;if(newHeight===lastHeight){break}lastHeight=newHeight;scrollCount++}catch(e){console.warn('❌ Scroll error:',e);break}}}(async()=>{console.log('⏳ Bắt đầu xử lý các bài viết trên trang hiện tại…');try{const worker=window;await waitForWindowReady(worker,30000);await scrollToBottomSmooth(worker,20,800);await delay(1500);const buttons=getAllByXPathInWindow(worker,BUTTON_XPATH);console.log(`🔍 Tìm thấy ${buttons.length} nút vote.`);for(let btn of buttons){try{await clickIfNeededInWindow(worker,btn);await delay(1200)}catch(e){console.warn('⚠️ Lỗi khi xử lý nút:',e)}}console.log('🎉 Hoàn tất xử lý tất cả nút trên trang!')}catch(e){console.error('⚠️ Lỗi tổng thể:',e)}})()})();
             </div>
-            <button class="copy-button" onclick="copyToClipboard()">📋 Copy mã nguồn</button>
+            <button onclick="copyToClipboard(event)">📋 Copy mã nguồn</button>
+
         </details>
 
         <div style="text-align: center; margin-top: 30px; color: #718096;">
